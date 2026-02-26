@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+
+  3x-ui:
+    image: crasivo/3x-ui
+    container_name: 3x-ui
+    restart: unless-stopped
+    environment:
+      XUI_ADMIN_USERNAME: admin
+      XUI_ADMIN_PASSWORD: admin
+    ports:
+      - "2096:2096"
+      - "2053:2053"
+    networks:
+      - vpnbot-network
+    hostname: 3x-ui
+
+  vpnbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vpnbot
+    restart: unless-stopped
+    depends_on:
+      - 3x-ui
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+      - usersdb:/app/data
+    networks:
+      - vpnbot-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('https://api.telegram.org/bot${BOT_TOKEN}/getMe', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+networks:
+  vpnbot-network:
+    driver: bridge
+
+volumes:
+  usersdb:
