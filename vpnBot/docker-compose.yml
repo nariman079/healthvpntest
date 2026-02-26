@@ -12,8 +12,7 @@ services:
     ports:
       - "2096:2096"
       - "2053:2053"
-    networks:
-      - vpnbot-network
+    network_mode: "host"
     hostname: 3x-ui
 
   vpnbot:
@@ -30,8 +29,7 @@ services:
       - ./logs:/app/logs
       - ./backups:/app/backups
       - usersdb:/app/data
-    networks:
-      - vpnbot-network
+    network_mode: "host"
     healthcheck:
       test: ["CMD", "python", "-c", "import requests; requests.get('https://api.telegram.org/bot${BOT_TOKEN}/getMe', timeout=5)"]
       interval: 30s
@@ -45,9 +43,6 @@ services:
         reservations:
           memory: 256M
 
-networks:
-  vpnbot-network:
-    driver: bridge
 
 volumes:
   usersdb:
