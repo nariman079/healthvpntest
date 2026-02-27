@@ -26,6 +26,8 @@ USER botuser
 
 # Создаем директории для логов, бэкапов и данных
 RUN mkdir -p /app/logs /app/backups /app/data
+# Создайте папку и отдайте права пользователю, от которого работает бот
+RUN mkdir -p /app/logs && sudo chown -R botuser:botuser logs
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
