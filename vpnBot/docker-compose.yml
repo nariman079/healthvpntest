@@ -1,19 +1,25 @@
 version: '3.8'
 
 services:
-
   3x-ui:
-    image: crasivo/3x-ui
+    image: ghcr.io/mhsanaei/3x-ui:latest  # актуальный образ с поддержкой Reality
     container_name: 3x-ui
     restart: unless-stopped
+    network_mode: "host"  # важно для производительности и Reality
+    volumes:
+      - ./db:/etc/3x-ui
+      - ./logs:/var/log/xray
+      - ./config:/etc/xray
     environment:
+      XUI_V2RAY_CONFIG: /etc/xray/config.json
+      XUI_LOG_LEVEL: "warning"
       XUI_ADMIN_USERNAME: admin
       XUI_ADMIN_PASSWORD: admin
-    ports:
-      - "2096:2096"
-      - "2053:2053"
-    network_mode: "host"
-    hostname: 3x-ui
+    cap_add:
+      - NET_ADMIN  # требуется для некоторых функций Xray
+
+  
+ 
 
   vpnbot:
     build:
